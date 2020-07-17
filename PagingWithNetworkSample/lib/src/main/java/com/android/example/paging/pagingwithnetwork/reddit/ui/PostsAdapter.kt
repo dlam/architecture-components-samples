@@ -45,6 +45,8 @@ class PostsAdapter(private val glide: GlideRequests)
         }
     }
 
+    fun getItemm(position: Int) = super.getItem(position)
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RedditPostViewHolder {
         return RedditPostViewHolder.create(parent, glide)
     }

@@ -29,6 +29,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadState
+import androidx.paging.LoadState.NotLoading
 import com.android.example.paging.pagingwithnetwork.GlideApp
 import com.android.example.paging.pagingwithnetwork.R
 import com.android.example.paging.pagingwithnetwork.reddit.ServiceLocator
@@ -36,6 +37,8 @@ import com.android.example.paging.pagingwithnetwork.reddit.repository.RedditPost
 import kotlinx.android.synthetic.main.activity_reddit.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.scan
+import kotlinx.coroutines.flow.scanReduce
 
 /**
  * A list activity that shows reddit posts in the given sub-reddit.
@@ -89,9 +92,25 @@ class RedditActivity : AppCompatActivity() {
 
         lifecycleScope.launchWhenCreated {
             @OptIn(ExperimentalCoroutinesApi::class)
-            adapter.loadStateFlow.collectLatest { loadStates ->
-                swipe_refresh.isRefreshing = loadStates.refresh is LoadState.Loading
-            }
+            adapter.loadStateFlow
+                .scanReduce { prev, value ->
+                    if (prev.refresh !is NotLoading && value.refresh is NotLoading) {
+                        println(adapter.itemCount)
+                    }
+
+                    if (prev.append !is NotLoading && value.append is NotLoading) {
+                        println(adapter.itemCount)
+
+                        if (adapter.itemCount == 90) {
+                            println("item 0: ${adapter.getItemm(0)}")
+                        }
+                    }
+
+                    value
+                }
+                .collectLatest { loadStates ->
+                    swipe_refresh.isRefreshing = loadStates.refresh is LoadState.Loading
+                }
         }
 
         lifecycleScope.launchWhenCreated {
