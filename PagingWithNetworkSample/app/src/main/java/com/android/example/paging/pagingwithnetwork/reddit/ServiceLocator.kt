@@ -38,8 +38,8 @@ interface ServiceLocator {
             synchronized(LOCK) {
                 if (instance == null) {
                     instance = DefaultServiceLocator(
-                            app = context.applicationContext as Application,
-                            useInMemoryDb = false)
+                        app = context.applicationContext as Application,
+                        useInMemoryDb = false)
                 }
                 return instance!!
             }
@@ -62,7 +62,10 @@ interface ServiceLocator {
 /**
  * default implementation of ServiceLocator that uses production endpoints.
  */
-open class DefaultServiceLocator(val app: Application, val useInMemoryDb: Boolean) : ServiceLocator {
+open class DefaultServiceLocator(
+    val app: Application,
+    val useInMemoryDb: Boolean
+) : ServiceLocator {
     private val db by lazy {
         RedditDb.create(app, useInMemoryDb)
     }
@@ -74,10 +77,10 @@ open class DefaultServiceLocator(val app: Application, val useInMemoryDb: Boolea
     override fun getRepository(type: RedditPostRepository.Type): RedditPostRepository {
         return when (type) {
             RedditPostRepository.Type.IN_MEMORY_BY_ITEM -> InMemoryByItemRepository(
-                    redditApi = getRedditApi()
+                redditApi = getRedditApi()
             )
             RedditPostRepository.Type.IN_MEMORY_BY_PAGE -> InMemoryByPageKeyRepository(
-                    redditApi = getRedditApi()
+                redditApi = getRedditApi()
             )
             RedditPostRepository.Type.DB -> DbRedditPostRepository(
                 db = db,

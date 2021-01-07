@@ -25,19 +25,19 @@ import com.android.example.paging.pagingwithnetwork.GlideApp
 import com.android.example.paging.pagingwithnetwork.reddit.ui.PostsAdapter
 import com.android.example.paging.pagingwithnetwork.reddit.vo.RedditPost
 import kotlinx.android.synthetic.main.activity_benchmark.*
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class BenchmarkActivity : AppCompatActivity() {
-    val testExecutor = TestExecutor()
+    val dispatcher = TestDispatcher()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_benchmark)
 
         val glide = GlideApp.with(this)
-        val adapter = PostsAdapter(glide)
+        val adapter = PostsAdapter(glide, dispatcher, dispatcher)
         list.adapter = adapter
 
         val config = PagingConfig(
@@ -50,7 +50,6 @@ class BenchmarkActivity : AppCompatActivity() {
         }
 
         lifecycleScope.launch {
-            @OptIn(ExperimentalCoroutinesApi::class)
             pager.flow.collectLatest {
                 adapter.submitData(it)
             }

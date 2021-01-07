@@ -33,6 +33,7 @@ import com.android.example.paging.pagingwithnetwork.R
 import com.android.example.paging.pagingwithnetwork.reddit.ServiceLocator
 import com.android.example.paging.pagingwithnetwork.reddit.repository.RedditPostRepository
 import kotlinx.android.synthetic.main.activity_reddit.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChangedBy
@@ -55,6 +56,7 @@ class RedditActivity : AppCompatActivity() {
 
     private val model: SubRedditViewModel by viewModels {
         object : AbstractSavedStateViewModelFactory(this, null) {
+
             override fun <T : ViewModel?> create(
                 key: String,
                 modelClass: Class<T>,
@@ -62,15 +64,14 @@ class RedditActivity : AppCompatActivity() {
             ): T {
                 val repoTypeParam = intent.getIntExtra(KEY_REPOSITORY_TYPE, 0)
                 val repoType = RedditPostRepository.Type.values()[repoTypeParam]
-                val repo = ServiceLocator.instance(this@RedditActivity)
-                    .getRepository(repoType)
+                val repo = ServiceLocator.instance(this@RedditActivity).getRepository(repoType)
                 @Suppress("UNCHECKED_CAST")
                 return SubRedditViewModel(repo, handle) as T
             }
         }
     }
 
-    private lateinit var adapter: PostsAdapter
+    internal lateinit var adapter: PostsAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,8 +82,14 @@ class RedditActivity : AppCompatActivity() {
     }
 
     private fun initAdapter() {
+        val serviceLocator = ServiceLocator.instance(this)
         val glide = GlideApp.with(this)
-        adapter = PostsAdapter(glide)
+
+        adapter = PostsAdapter(
+            glide,
+            Dispatchers.Main,
+            Dispatchers.Default,
+        )
         list.adapter = adapter.withLoadStateHeaderAndFooter(
             header = PostsLoadStateAdapter(adapter),
             footer = PostsLoadStateAdapter(adapter)

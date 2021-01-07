@@ -57,9 +57,9 @@ class SubRedditViewModel(
             .cachedIn(viewModelScope)
     ).flattenMerge(2)
 
-    fun shouldShowSubreddit(
-        subreddit: String
-    ) = savedStateHandle.get<String>(KEY_SUBREDDIT) != subreddit
+    fun shouldShowSubreddit(subreddit: String): Boolean {
+        return savedStateHandle.get<String>(KEY_SUBREDDIT) != subreddit
+    }
 
     fun showSubreddit(subreddit: String) {
         if (!shouldShowSubreddit(subreddit)) return

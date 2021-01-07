@@ -21,12 +21,20 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import com.android.example.paging.pagingwithnetwork.GlideRequests
 import com.android.example.paging.pagingwithnetwork.reddit.vo.RedditPost
+import kotlinx.coroutines.CoroutineDispatcher
 
 /**
  * A simple adapter implementation that shows Reddit posts.
  */
-class PostsAdapter(private val glide: GlideRequests)
-    : PagingDataAdapter<RedditPost, RedditPostViewHolder>(POST_COMPARATOR) {
+class PostsAdapter(
+    private val glide: GlideRequests,
+    mainDispatcher: CoroutineDispatcher,
+    workerDispatcher: CoroutineDispatcher
+) : PagingDataAdapter<RedditPost, RedditPostViewHolder>(
+    diffCallback = POST_COMPARATOR,
+    mainDispatcher = mainDispatcher,
+    workerDispatcher = workerDispatcher
+) {
 
     override fun onBindViewHolder(holder: RedditPostViewHolder, position: Int) {
         holder.bind(getItem(position))
