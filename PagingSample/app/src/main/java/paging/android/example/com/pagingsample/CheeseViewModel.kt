@@ -27,6 +27,9 @@ import kotlinx.coroutines.flow.map
  * A simple [AndroidViewModel] that provides a [Flow]<[PagingData]> of delicious cheeses.
  */
 class CheeseViewModel(private val dao: CheeseDao) : ViewModel() {
+
+    private val pagingSourceFactory =
+        InvalidatingPagingSourceFactory { MyPagingSource(dao)}
     /**
      * We use the Kotlin [Flow] property available on [Pager]. Java developers should use the
      * RxJava or LiveData extension properties available in `PagingRx` and `PagingLiveData`.
@@ -59,12 +62,12 @@ class CheeseViewModel(private val dao: CheeseDao) : ViewModel() {
              *
              * This number triggers the PagedList to start dropping distant pages as more are loaded.
              */
-            maxSize = 200
-        )
-    ) {
-//        dao.allCheesesByName()
-        MyPagingSource(dao)
-    }.flow
+            maxSize = 200,
+
+        ),
+        pagingSourceFactory = pagingSourceFactory
+    )
+        .flow
         .map { pagingData ->
             pagingData
                 // Map cheeses to common UI model.
@@ -92,13 +95,15 @@ class CheeseViewModel(private val dao: CheeseDao) : ViewModel() {
 
     fun insert(text: CharSequence) = ioThread {
         dao.insert(Cheese(id = 0, name = text.toString()))
+        pagingSourceFactory.invalidate()
     }
 
     fun remove(cheese: Cheese) = ioThread {
         dao.delete(cheese)
+        pagingSourceFactory.invalidate()
     }
 
     companion object{
-        val PAGE_SIZE: Int = 10
+        val PAGE_SIZE: Int = 5
     }
 }
