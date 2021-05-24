@@ -76,4 +76,12 @@ dependencies {
     androidTestImplementation deps.coroutines.test
     androidTestImplementation deps.truth
     androidTestImplementation deps.espresso.contrib
+
+    //room coroutine
+//    implementation 'androidx.room:room-coroutines:2.1.0-alpha04'
+    def roomVersion = '2.3.0'
+    def pagingVersion = '3.0.0'
+    implementation "androidx.room:room-runtime:$roomVersion"
+    implementation "androidx.room:room-ktx:$roomVersion"
+    implementation "androidx.paging:paging-runtime-ktx:$pagingVersion"
 }

@@ -17,10 +17,8 @@
 package paging.android.example.com.pagingsample
 
 import androidx.paging.PagingSource
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.Query
+import androidx.room.*
+import androidx.sqlite.db.SupportSQLiteQuery
 
 /**
  * Database Access Object for the Cheese database.
@@ -42,4 +40,7 @@ interface CheeseDao {
 
     @Delete
     fun delete(cheese: Cheese)
+
+    @RawQuery
+    suspend fun rawGetAllCheeses(query: SupportSQLiteQuery) : List<Cheese>
 }

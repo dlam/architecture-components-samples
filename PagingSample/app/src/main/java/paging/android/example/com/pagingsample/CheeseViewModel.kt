@@ -42,7 +42,7 @@ class CheeseViewModel(private val dao: CheeseDao) : ViewModel() {
              * user scrolling on a large device is expected to scroll through items more quickly
              * than a small device, such as when the large device uses a grid layout of items.
              */
-            pageSize = 60,
+            pageSize = PAGE_SIZE,
 
             /**
              * If placeholders are enabled, PagedList will report the full size but some items might
@@ -62,7 +62,8 @@ class CheeseViewModel(private val dao: CheeseDao) : ViewModel() {
             maxSize = 200
         )
     ) {
-        dao.allCheesesByName()
+//        dao.allCheesesByName()
+        MyPagingSource(dao)
     }.flow
         .map { pagingData ->
             pagingData
@@ -95,5 +96,9 @@ class CheeseViewModel(private val dao: CheeseDao) : ViewModel() {
 
     fun remove(cheese: Cheese) = ioThread {
         dao.delete(cheese)
+    }
+
+    companion object{
+        val PAGE_SIZE: Int = 10
     }
 }
